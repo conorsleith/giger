@@ -1,0 +1,5 @@
+bleak
+loguru
+simple-pid
+customtkinter
+pycycling
