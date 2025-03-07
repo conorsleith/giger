@@ -1,6 +1,5 @@
 import asyncio
 import math
-import random
 from threading import Thread
 from time import time
 from typing import Tuple
@@ -21,7 +20,6 @@ from customtkinter import (
 )
 from loguru import logger
 from settings import settings
-from tkinter import Canvas, Frame
 
 customtkinter.set_appearance_mode(
     "system"
@@ -201,7 +199,7 @@ class HRTrainer(customtkinter.CTk):
         if self._on_off_switch.get():
             self._on_off_switch.toggle()
         watts = self._set_current_watts_slider.get()
-        future = asyncio.run_coroutine_threadsafe(
+        asyncio.run_coroutine_threadsafe(
             self._giger.set_current_power(watts), self._loop
         )
         # future.add_done_callback(lambda *args, **kwargs: self._current_watts_callback(watts))
@@ -227,7 +225,7 @@ class HRTrainer(customtkinter.CTk):
         self._device_picker_window.lift(aboveThis=self)
 
     def _change_devices(self, hrm_device, trainer_device):
-        future = asyncio.run_coroutine_threadsafe(
+        asyncio.run_coroutine_threadsafe(
             self._async_change_devices(hrm_device, trainer_device), self._loop
         )
 
@@ -597,7 +595,7 @@ class HRTrainer(customtkinter.CTk):
         # logger.warning("UNCOMMENT THE STUFF BELOW")
         hrm_uuid = settings.last_used_hrm_uuid
         trainer_uuid = settings.last_used_trainer_uuid
-        future = asyncio.gather(set_up_hr(hrm_uuid), set_up_trainer(trainer_uuid))
+        asyncio.gather(set_up_hr(hrm_uuid), set_up_trainer(trainer_uuid))
 
         while self._giger.trainer_control is None or self._giger.hr_client is None:
             await asyncio.sleep(1)

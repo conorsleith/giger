@@ -1,7 +1,6 @@
-from threading import Thread
 from typing import Tuple
 
-from bleak import BleakClient, BleakScanner
+from bleak import BleakClient
 from loguru import logger
 from pycycling.tacx_trainer_control import TacxTrainerControl
 
@@ -58,7 +57,7 @@ class TacXWrapper:
 
     async def set_gear(self, gear):
         try:
-            ratio = self.gear_ratios[gear]
+            self.gear_ratios[gear]
             await self._trainer_control.set_user_configuration(
                 self.user_weight,
                 self.bicycle_weight,

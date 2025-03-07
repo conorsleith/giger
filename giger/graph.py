@@ -1,4 +1,3 @@
-import random
 from collections import deque
 from _types import Measurement
 from customtkinter import CTkSlider, CTkLabel, CTkFrame

@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from bleak import BleakScanner, BleakClient, BLEDevice
 from customtkinter import CTkFrame, CTkToplevel, CTkScrollableFrame, CTkButton
-from devices import HeartRateDeviceScanner, HR_SERVICE_UUID, TACX_UART_BLE_UUID
+from devices import HR_SERVICE_UUID, TACX_UART_BLE_UUID
 from loguru import logger
 from pycycling.tacx_trainer_control import TacxTrainerControl
 from tkinter import ttk
@@ -87,14 +87,14 @@ class DevicePicker(CTkToplevel):
         return trainers
 
     def _add_hrm_device(self, device: BLEDevice):
-        if not device.address in self._hrm_devices:
+        if device.address not in self._hrm_devices:
             table_id = self._hr_table.insert(
                 "", "end", device.address, text=device.name
             )
             self._hrm_devices[device.address] = (table_id, device.name)
 
     def _add_trainer_device(self, device: BLEDevice):
-        if not device.address in self._trainer_devices:
+        if device.address not in self._trainer_devices:
             table_id = self._trainer_table.insert(
                 "", "end", device.address, text=device.name
             )
