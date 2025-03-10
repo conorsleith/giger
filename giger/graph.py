@@ -1,12 +1,12 @@
-import random
 from collections import deque
 from _types import Measurement
 from customtkinter import CTkSlider, CTkLabel, CTkFrame
 from typing import Callable, Tuple
 from tkinter import Frame, Canvas
 
+
 class Graph:
-    
+
     _x_axis_pad = 20
     _y_axis_pad = 20
     _point_width = 1
@@ -17,12 +17,15 @@ class Graph:
     _max_hr = 220
     _max_watts = 500
     _graph_size_ms = 60000
-    
-    def __init__(self, master: Frame,
-                 width: int,
-                 height: int,
-                 get_data_callback: Callable[[], Tuple[Measurement, Measurement, Measurement]],
-                 default_pack=True):
+
+    def __init__(
+        self,
+        master: Frame,
+        width: int,
+        height: int,
+        get_data_callback: Callable[[], Tuple[Measurement, Measurement, Measurement]],
+        default_pack=True,
+    ):
         self._master = master
         self.width = width
         self._width = width
@@ -37,7 +40,9 @@ class Graph:
         self._master.grid_rowconfigure(0, weight=1)
         self._canvas = Canvas(master=self._master, background="white")
         self._control_frame = CTkFrame(master=self._master)
-        self._update_rate_slider = CTkSlider(master=self._control_frame, from_=1, to=60, number_of_steps=59)
+        self._update_rate_slider = CTkSlider(
+            master=self._control_frame, from_=1, to=60, number_of_steps=59
+        )
         self._update_rate_slider.configure(command=self._update_rate_slider_callback)
         self._update_rate_label = CTkLabel(master=self._control_frame)
         self._update_rate_value_label = CTkLabel(master=self._control_frame)
@@ -45,12 +50,15 @@ class Graph:
         self._update_rate_slider.set(30)
         self._update_rate_label.configure(text="Graph frame rate:")
         self._canvas.pack(fill="both", expand=True, side="top", pady=5)
-        self._update_rate_label.pack(side="left", padx=10, )
+        self._update_rate_label.pack(
+            side="left",
+            padx=10,
+        )
         self._update_rate_slider.pack(side="left", padx=5, ipadx=5)
         self._update_rate_value_label.pack(side="left", padx=10)
         self._control_frame.pack(side="bottom", fill="x", expand=False, pady=5)
 
-        self._hr_vals = deque(maxlen=width) # Tuple of (timestamp, value)
+        self._hr_vals = deque(maxlen=width)  # Tuple of (timestamp, value)
         self._power_vals = deque(maxlen=width)
         self._hr_setpoint_vals = deque(maxlen=width)
         self.hr_setpoint: int = 0
@@ -71,13 +79,13 @@ class Graph:
         self._y_axis_pad = self._x_axis_pad + self._control_frame.winfo_height() + 15
 
     def _update_rate_slider_callback(self, value):
-        self.update_period_ms = int(1000/value)
+        self.update_period_ms = int(1000 / value)
         self._update_rate_value_label.configure(text=f"{value: .0f} hz")
 
     def _draw_axes(self):
         origin_x = self._x_axis_pad
         origin_y = self._height - self._y_axis_pad
-        self._canvas.create_line(origin_x, 0, origin_x, origin_y, self._width, origin_y, fill=self._axis_color) # type: ignore # draw Y axis
+        self._canvas.create_line(origin_x, 0, origin_x, origin_y, self._width, origin_y, fill=self._axis_color)  # type: ignore # draw Y axis
 
     def pack(self, *args, **kwargs):
         self._canvas.pack(*args, **kwargs)
@@ -139,12 +147,16 @@ class Graph:
     def _draw_power_plot(self):
         if not self._power_vals:
             return
-        self._draw_plot(self._power_vals, self._calculate_power_y_value, self._power_color)
+        self._draw_plot(
+            self._power_vals, self._calculate_power_y_value, self._power_color
+        )
 
     def _draw_hr_setpoint(self):
         if not self._hr_setpoint_vals:
             return
-        self._draw_plot(self._hr_setpoint_vals, self._calculate_hr_y_value, self._hr_setpoint_color)
+        self._draw_plot(
+            self._hr_setpoint_vals, self._calculate_hr_y_value, self._hr_setpoint_color
+        )
 
     def update(self):
         hr_measurement, power_measurement, hr_setpoint = self.get_data_callback()
@@ -158,8 +170,6 @@ class Graph:
         self._draw_power_plot()
         self._draw_hr_setpoint()
         self._draw_axes()
-
-
 
     # def _draw_hr_plot(self):
     #     if not len(self._hr_vals):

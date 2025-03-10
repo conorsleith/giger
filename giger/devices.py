@@ -1,8 +1,6 @@
-
-from threading import Thread
 from typing import Tuple
 
-from bleak import BleakClient, BleakScanner
+from bleak import BleakClient
 from loguru import logger
 from pycycling.tacx_trainer_control import TacxTrainerControl
 
@@ -46,7 +44,7 @@ class TacXWrapper:
         21: 4.54,
         22: 4.84,
         23: 5.14,
-        24: 5.49
+        24: 5.49,
     }
 
     def __init__(self, client):
@@ -59,10 +57,12 @@ class TacXWrapper:
 
     async def set_gear(self, gear):
         try:
-            ratio = self.gear_ratios[gear]
+            self.gear_ratios[gear]
             await self._trainer_control.set_user_configuration(
-                self.user_weight, self.bicycle_weight, self.wheel_diameter,
-                self.gear_ratios[gear]
+                self.user_weight,
+                self.bicycle_weight,
+                self.wheel_diameter,
+                self.gear_ratios[gear],
             )
             self._gear = gear
         except KeyError:
@@ -76,10 +76,12 @@ class TacXWrapper:
         await self.set_gear(self._gear - 1)
 
 
-async def set_up_devices(trainer_device_uuid: str, hr_device_uuid: str) -> Tuple[TacxTrainerControl, BleakClient]:
+async def set_up_devices(
+    trainer_device_uuid: str, hr_device_uuid: str
+) -> Tuple[TacxTrainerControl, BleakClient]:
     trainer_client = BleakClient(trainer_device_uuid)
     hr_client = BleakClient(hr_device_uuid)
-    
+
     logger.info("Connecting to heart rate monitor")
     await hr_client.connect()
     if not hr_client.is_connected:
@@ -94,6 +96,7 @@ async def set_up_devices(trainer_device_uuid: str, hr_device_uuid: str) -> Tuple
     trainer_control = TacxTrainerControl(trainer_client)
     return trainer_control, hr_client
 
+
 async def set_up_hr(uuid=HR_MONITOR_UUID):
     logger.info("Connecting to heart rate monitor")
     hr_client = BleakClient(uuid)
@@ -102,6 +105,7 @@ async def set_up_hr(uuid=HR_MONITOR_UUID):
         raise RuntimeError("Failed to connect to Heart Rate Monitor.")
     logger.info("Heart rate monitor connected!")
     return hr_client
+
 
 async def set_up_trainer(uuid=TRAINER_UUID):
     trainer_client = BleakClient(uuid)
@@ -112,7 +116,8 @@ async def set_up_trainer(uuid=TRAINER_UUID):
     logger.info("Trainer connected!")
     trainer_control = TacxTrainerControl(trainer_client)
     return trainer_control
-    
+
+
 async def set_up_trainer_wrapper():
     trainer_client = BleakClient(TRAINER_UUID)
     logger.info("Connecting to trainer")
@@ -122,6 +127,7 @@ async def set_up_trainer_wrapper():
     logger.info("Trainer connected!")
     trainer_control_wrapper = TacXWrapper(trainer_client)
     return trainer_control_wrapper
+
 
 async def get_devices():
     trainer_control, hr_client = await set_up_devices(TRAINER_UUID, HR_MONITOR_UUID)
